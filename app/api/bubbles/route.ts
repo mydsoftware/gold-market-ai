@@ -1,0 +1,3 @@
+import {NextResponse} from 'next/server'; import {getBubbleData} from '@/lib/market';
+export const runtime='nodejs'; export const dynamic='force-dynamic';
+export async function GET(){try{return NextResponse.json({source:'TGJU',fetchedAt:new Date().toISOString(),bubbles:await getBubbleData()},{headers:{'Cache-Control':'no-store'}})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'خطا در حباب'},{status:502})}}
