@@ -1,4 +1,15 @@
-import {NextResponse} from 'next/server';
-import {getHistory} from '@/lib/market';
-export const runtime='nodejs'; export const dynamic='force-dynamic';
-export async function GET(_req:Request,{params}:{params:Promise<{slug:string}>}){try{const {slug}=await params;const history=await getHistory(slug);return NextResponse.json({slug,source:'TGJU',history},{headers:{'Cache-Control':'no-store'}})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'خطا در تاریخچه'},{status:502})}}
+import { NextResponse } from 'next/server';
+import { history } from '@/lib/db';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
+  try {
+    const { slug } = await params;
+    const days = Math.min(Math.max(Number(new URL(request.url).searchParams.get('days') || 1), 1), 30);
+    return NextResponse.json({ symbol: slug, days, source: 'SQLite', data: history(slug, days * 24 * 60 * 60 * 1000) }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'خطا در تاریخچه' }, { status: 500 });
+  }
+}
