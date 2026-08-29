@@ -9,10 +9,26 @@
 - `/api/markets` قیمت‌های زنده
 - `/api/history/[slug]` آرشیو روزانه
 - `/api/bubbles` حباب سکه
+- `/api/indicators` شاخص‌های تکنیکال
 - `/api/ai/analyze` آداپتر Agent Manager
 - صفحات اختصاصی `/market/[slug]`
 
-## اجرای محلی
+## Market Intelligence
+
+موتور تحلیل، تغییر قیمت، درصد تغییر، سقف/کف، SMA7، SMA30، روند، حمایت و مقاومت را از تاریخچه محاسبه می‌کند. AI فقط باید بر اساس داده واقعی تحلیل کند و نباید قیمت را حدس بزند.
+
+## اتصال Agent Manager
+
+در Vercel تنظیم کنید:
+
+```text
+AGENT_MANAGER_URL=https://...
+AGENT_MANAGER_TOKEN=...
+```
+
+`POST /api/ai/analyze` داده بازار، شاخص‌ها و prompt ساختاریافته را به Agent Manager ارسال می‌کند. اگر URL تنظیم نشده باشد، API در حالت fallback تحلیل پایه ارائه می‌دهد.
+
+## اجرا
 
 ```bash
 npm install
@@ -21,19 +37,12 @@ npm run dev
 
 ## Vercel
 
-Repository را به یک Project در Vercel متصل کنید و Root Directory را ریشه همین repository قرار دهید. Framework روی Next.js تشخیص داده می‌شود.
-
-برای اتصال Agent Manager در Environment Variables این دو مقدار را تنظیم کنید:
-
-```text
-AGENT_MANAGER_URL=https://...
-AGENT_MANAGER_TOKEN=...
-```
+Repository را به Project متصل و Root Directory را ریشه repository قرار دهید. Framework روی Next.js تشخیص داده می‌شود.
 
 ## منبع داده
 
-نسخه فعلی برای دریافت داده از صفحات عمومی TGJU استفاده می‌کند. TGJU در مستندات خود وب‌سرویس رسمی JSON/XML را نیز معرفی کرده است؛ برای نسخه تجاری بهتر است provider به API رسمی دارای توکن منتقل شود.
+نسخه فعلی برای دریافت داده از صفحات عمومی TGJU استفاده می‌کند. برای نسخه تجاری بهتر است provider به API رسمی TGJU دارای توکن منتقل شود.
 
-## نکته تاریخچه
+## تاریخچه پایدار
 
-تاریخچه از صفحات آرشیو هر پروفایل TGJU خوانده می‌شود و در سمت سرور پردازش می‌شود. برای تاریخچه لحظه‌ای بلندمدت و پایدار، در فاز بعدی باید یک دیتابیس/کش دائمی و job جمع‌آوری داده اضافه شود.
+برای تاریخچه لحظه‌ای بلندمدت، مرحله بعدی اضافه‌کردن دیتابیس/کش دائمی و job جمع‌آوری داده است.
