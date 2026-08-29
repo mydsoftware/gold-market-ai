@@ -1,0 +1,9 @@
+'use client';
+import {useEffect,useState} from 'react';
+import MarketChart from '@/components/MarketChart';
+
+export default function Intelligence(){
+ const [symbol,setSymbol]=useState('geram18'),[days,setDays]=useState(1),[rows,setRows]=useState<any[]>([]),[summary,setSummary]=useState<any>(null);
+ useEffect(()=>{fetch(`/api/history/${symbol}?days=${days}`,{cache:'no-store'}).then(r=>r.json()).then(j=>{const data=j.data||j.history||[];setRows(data);if(data.length)fetch('/api/market-summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({history:data,current:data.at(-1)?.price})}).then(r=>r.json()).then(setSummary).catch(()=>setSummary(null));});},[symbol,days]);
+ return <main style={{maxWidth:1100,margin:'0 auto',padding:32,direction:'rtl'}}><h1>هوش بازار</h1><p>تاریخچه ذخیره‌شده و شاخص‌های محاسباتی بازار</p><div style={{display:'flex',gap:8,margin:'20px 0'}}><select value={symbol} onChange={e=>setSymbol(e.target.value)}><option value="geram18">طلای ۱۸ عیار</option><option value="coinEmami">سکه امامی</option><option value="usd">دلار</option><option value="ons">اونس</option></select>{[1,7,30].map(d=><button key={d} onClick={()=>setDays(d)}>{d} روز</button>)}</div><section style={{padding:20,border:'1px solid #ddd',borderRadius:16}}><MarketChart data={rows}/></section>{summary&&<section style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginTop:16}}><div>روند<br/><b>{summary.indicators?.trend}</b></div><div>حمایت<br/><b>{summary.indicators?.support?.toLocaleString('fa-IR')||'—'}</b></div><div>مقاومت<br/><b>{summary.indicators?.resistance?.toLocaleString('fa-IR')||'—'}</b></div></section>}<small>تحلیل صرفاً اطلاعاتی است و توصیه قطعی سرمایه‌گذاری نیست.</small></main>;
+}
